@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HENNA'S CLOCK</title>
+    <style>
+        body { text-align: center; margin: 0; }
+        canvas { background-color: white; }
+    </style>
+</head>
+<body>
+    <h1>HI MY DEAR HENNA</h1>
+    <canvas id="clockCanvas" width="420" height="420"></canvas>
+
+    <script>
+        const canvas = document.getElementById('clockCanvas');
+        const ctx = canvas.getContext('2d');
+        const centerX = 210;
+        const centerY = 210;
+        const radius = 180;
+
+        function drawClock(hour, minute, second) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw clock circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+
+            // Draw hour lines and numbers
+            for (let i = 1; i <= 12; i++) {
+                const angle = i * 30 * Math.PI / 180;
+                const x = centerX + Math.sin(angle) * radius * 0.8;
+                const y = centerY - Math.cos(angle) * radius * 0.8;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(x, y);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'black';
+                ctx.stroke();
+
+                const textX = centerX + Math.sin(angle) * radius * 0.7;
+                const textY = centerY - Math.cos(angle) * radius * 0.7;
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(i, textX, textY);
+            }
+
+            // Draw hour hand
+            const hourAngle = (hour % 12 + minute / 60) * 30 * Math.PI / 180;
+            const hourX = centerX + Math.sin(hourAngle) * radius * 0.5;
+            const hourY = centerY - Math.cos(hourAngle) * radius * 0.5;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(hourX, hourY);
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+
+            // Draw minute hand
+            const minuteAngle = minute * 6 * Math.PI / 180;
+            const minuteX = centerX + Math.sin(minuteAngle) * radius * 0.8;
+            const minuteY = centerY - Math.cos(minuteAngle) * radius * 0.8;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(minuteX, minuteY);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+
+            // Draw second hand
+            const secondAngle = second * 6 * Math.PI / 180;
+            const secondX = centerX + Math.sin(secondAngle) * radius * 0.9;
+            const secondY = centerY - Math.cos(secondAngle) * radius * 0.9;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(secondX, secondY);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'red';
+            ctx.stroke();
+        }
+
+        function updateClock() {
+            fetch('/time')
+                .then(response => response.json())
+                .then(data => {
+                    drawClock(data.hour, data.minute, data.second);
+                });
+        }
+
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>
+
